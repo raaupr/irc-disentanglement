@@ -389,7 +389,7 @@ def get_features(name, query_no, link_no, text_ascii, text_tok, info, target_inf
 def read_data(filenames, is_test=False):
     instances = []
     done = set()
-    for filename in filenames:
+    for filename in tqdm(filenames, desc="Reading"):
         name = filename
         for ending in [".annotation.txt", ".ascii.txt", ".raw.txt", ".tok.txt"]:
             if filename.endswith(ending):
