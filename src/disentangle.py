@@ -7,7 +7,7 @@ import string
 import time
 
 import numpy as np
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 FEATURES = 77
 
@@ -561,13 +561,19 @@ def do_instance(instance, train, model, optimizer, do_cache=True):
 
 train = []
 if args.train:
+    print(f"Reading data: {args.train}")
     train = read_data(args.train)
+    print(f"Reading data: DONE")
 dev = []
 if args.dev:
+    print(f"Reading data: {args.dev}")
     dev = read_data(args.dev)
+    print(f"Reading data: DONE")
 test = dev
 if args.test:
+    print(f"Reading data: {args.test}")
     test = read_data(args.test, True)
+    print(f"Reading data: DONE")
 if args.random_sample and args.train:
     random.seed(args.seed)
     random.shuffle(train)
@@ -587,6 +593,7 @@ optimizer.set_clip_threshold(args.clip)
 
 prev_best = None
 if args.train:
+    print('Start training...')
     step = 0
     for epoch in tqdm(range(EPOCHS), position=0, desc='Epochs'):
         random.shuffle(train)
