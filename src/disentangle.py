@@ -51,6 +51,7 @@ def main(raw_args=None):
     parser.add_argument('--clip', default=3.740, type=float, help="Gradient clipping.")
 
     args = parser.parse_args(raw_args)
+    print(args)
 
     WEIGHT_DECAY = args.weight_decay
     HIDDEN = args.hidden
