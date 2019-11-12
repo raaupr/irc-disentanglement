@@ -7,6 +7,7 @@ import string
 import time
 
 import numpy as np
+from tqdm import tqdm
 
 FEATURES = 77
 
@@ -587,7 +588,7 @@ optimizer.set_clip_threshold(args.clip)
 prev_best = None
 if args.train:
     step = 0
-    for epoch in range(EPOCHS):
+    for epoch in tqdm(range(EPOCHS), position=0, desc='Epochs'):
         random.shuffle(train)
 
         # Update learning rate
@@ -598,7 +599,7 @@ if args.train:
         match = 0
         total = 0
         loss_steps = 0
-        for instance in train:
+        for instance in tqdm(train, position=1, desc=f'Epoch {epoch} batches'):
             step += 1
 
             dy.renew_cg()
