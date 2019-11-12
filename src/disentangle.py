@@ -7,7 +7,7 @@ import string
 import time
 
 import numpy as np
-from tqdm.autonotebook import tqdm
+from tqdm import tqdm_notebook as tqdm
 
 FEATURES = 77
 
