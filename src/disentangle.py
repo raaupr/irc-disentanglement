@@ -7,7 +7,7 @@ import string
 import time
 
 import numpy as np
-from tqdm import tqdm_notebook as tqdm
+from tqdm.autonotebook import tqdm
 
 FEATURES = 77
 cache = {}
