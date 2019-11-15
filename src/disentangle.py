@@ -37,6 +37,7 @@ def main(raw_args=None):
     # Inference arguments
     parser.add_argument('--max-dist', default=101, type=int, help="Maximum number of messages to consider when forming a link (count includes the current message).")
     parser.add_argument('--dynet-autobatch', action='store_true', help="Use dynet autobatching.")
+    parser.add_argument('--outfile', default=None, type=str, help="File to write output, to stdout if None.")
 
     # Training arguments
     parser.add_argument('--report-freq', default=5000, type=int, help="How frequently to evaluate on the development set.")
@@ -652,10 +653,17 @@ def main(raw_args=None):
         model.model.populate(location)
 
     # Run on test instances
-    for instance in test:
-        dy.renew_cg()
-        _, _, prediction = do_instance(instance, False, model, optimizer, False)
-        print("{}:{} {} -".format(instance[0], instance[1], instance[1] - prediction))
+    if args.outfile is not None:
+        with open(args.outfile, 'wt') as fout:
+            for instance in test:
+                dy.renew_cg()
+                _, _, prediction = do_instance(instance, False, model, optimizer, False)
+                fout.write("{}:{} {} -/n".format(instance[0], instance[1], instance[1] - prediction))
+    else:
+        for instance in test:
+            dy.renew_cg()
+            _, _, prediction = do_instance(instance, False, model, optimizer, False)
+            print("{}:{} {} -/n".format(instance[0], instance[1], instance[1] - prediction))
 
     log_file.close()
 
