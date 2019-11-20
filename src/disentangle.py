@@ -5,13 +5,16 @@ import random
 import sys
 import string
 import time
+import os
 
 import numpy as np
 from tqdm.autonotebook import tqdm
+from knockknock import email_sender
 
 FEATURES = 77
 cache = {}
 
+@email_sender(recipient_emails=[os.getenv('EMAIL_RECIPIENT')], sender_email=os.getenv('EMAIL_SENDER'))
 def main(raw_args=None):
 
     parser = argparse.ArgumentParser(description='IRC Conversation Disentangler.')
