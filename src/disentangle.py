@@ -643,6 +643,7 @@ def main(raw_args=None):
 
                     if prev_best is None or prev_best[0] < dacc:
                         prev_best = (dacc, epoch)
+                        tqdm.write(f'Saving best model: {args.prefix + ".dy.model"}')
                         model.model.save(args.prefix + ".dy.model")
 
             if prev_best is not None and epoch - prev_best[1] > 5:
