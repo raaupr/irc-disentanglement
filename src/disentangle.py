@@ -448,6 +448,7 @@ def main(raw_args=None):
             self.model = dy.ParameterCollection()
 
             if args.no_features:
+                print("Initializing a model with no features")
                 input_size = 0
             else:
                 input_size = FEATURES
