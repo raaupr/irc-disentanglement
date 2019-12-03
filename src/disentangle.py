@@ -479,6 +479,13 @@ def main(raw_args=None):
                 self.bias.append(self.model.add_parameters((HIDDEN,)))
             self.final_sum = self.model.add_parameters((HIDDEN, 1))
 
+        def __str__(self):
+            txt =   f"{super().__str__() }\n" + \
+                    f"Embedding: {self.pEmbedding.dim()}"
+            for i, hidden in enumerate(self.hidden):
+                txt += f"Hidden {i}: {hidden.dim()}"
+            return txt
+
         def __call__(self, query, options, gold, lengths, query_no):
             if len(options) == 1:
                 return None, 0
@@ -601,6 +608,7 @@ def main(raw_args=None):
     optimizer = None
     scheduler = None
     model = DyNetModel()
+    print(model)
     optimizer = None
     if args.opt == 'sgd':
         optimizer = dy.SimpleSGDTrainer(model.model, learning_rate=LEARNING_RATE)
