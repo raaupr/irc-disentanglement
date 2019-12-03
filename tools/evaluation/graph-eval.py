@@ -9,8 +9,10 @@ def get_pairs(filename, storage):
     for line in open(filename):
         line = line.strip()
         if ':' in line:
-            filename = line.split(':')[0]
+            filename = line.split(':')[0].split('/')[-1]
             line = line.split(":")[1]
+        else:
+            filename = filename.split('/')[-1]
 
         nums = [int(n) for n in line.split() if n != '-']
         source = max(nums)
@@ -33,6 +35,7 @@ def print_results(name, total_gold, total_auto, matched):
         f = 2 * p * r / (p + r)
     print("g/a/m{}:".format(name), total_gold, total_auto, matched)
     print("p/r/f{}: {:.3} {:.3} {:.3}".format(name, p, r, f))
+    return p,r,f
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate conversation graph output.')
@@ -66,5 +69,21 @@ if __name__ == '__main__':
             for pair in gold[filename]:
                 if pair in auto[filename]:
                     matched += 1
+
+    auto_srcs = set()
+    for filename in auto:
+        for pair in auto[filename]:
+            auto_srcs.add((filename, pair[0]))                   
+
+    with open('graph-eval.log', 'wt') as fout:
+        for filename in gold:
+            if filename in auto:
+                for pair in gold[filename]:
+                    if pair in auto[filename]:
+                        fout.write(f'{filename}:{pair[0]} {pair[1]} - match\n')
+                    elif (filename, pair[0]) not in auto_srcs:
+                        fout.write(f'{filename}:{pair[0]} {pair[1]} - not found\n')
+                    else:
+                        fout.write(f"{filename}:{pair[0]} {pair[1]} - doesn't match\n")
 
     print_results("", total_gold, total_auto, matched)

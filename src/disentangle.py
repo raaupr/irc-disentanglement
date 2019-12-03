@@ -9,12 +9,13 @@ import os
 
 import numpy as np
 from tqdm.autonotebook import tqdm
-from knockknock import email_sender
+from knockknock import slack_sender
 
 FEATURES = 77
 cache = {}
 
-@email_sender(recipient_emails=[os.getenv('EMAIL_RECIPIENT')], sender_email=os.getenv('EMAIL_SENDER'))
+# @email_sender(recipient_emails=[os.getenv('EMAIL_RECIPIENT')], sender_email=os.getenv('EMAIL_SENDER'))
+# @slack_sender(webhook_url=os.getenv('WEBHOOK_URL'), channel=os.getenv('SLACK_CHANNEL'))
 def main(raw_args=None):
 
     parser = argparse.ArgumentParser(description='IRC Conversation Disentangler.')
@@ -55,7 +56,7 @@ def main(raw_args=None):
     parser.add_argument('--clip', default=3.740, type=float, help="Gradient clipping.")
 
     args = parser.parse_args(raw_args)
-    print(args)
+    # print(args)
 
     WEIGHT_DECAY = args.weight_decay
     HIDDEN = args.hidden
@@ -404,7 +405,9 @@ def main(raw_args=None):
             if name in done:
                 continue
             done.add(name)
-            text_ascii = [l.strip().split() for l in open(name +".ascii.txt")]
+            tqdm.write(name)
+            with open(name + ".ascii.txt", 'rt') as fin:
+                text_ascii = [l.strip().split() for l in fin]
             text_tok = []
             for l in open(name +".tok.txt"):
                 l = l.strip().split()
@@ -568,19 +571,19 @@ def main(raw_args=None):
 
     train = []
     if args.train:
-        print(f"Reading data: {args.train}")
+        # print(f"Reading data: {args.train}")
         train = read_data(args.train)
-        print(f"Reading data: DONE")
+        # print(f"Reading data: DONE")
     dev = []
     if args.dev:
-        print(f"Reading data: {args.dev}")
+        # print(f"Reading data: {args.dev}")
         dev = read_data(args.dev)
-        print(f"Reading data: DONE")
+        # print(f"Reading data: DONE")
     test = dev
     if args.test:
-        print(f"Reading data: {args.test}")
+        # print(f"Reading data: {args.test}")
         test = read_data(args.test, True)
-        print(f"Reading data: DONE")
+        # print(f"Reading data: DONE")
     if args.random_sample and args.train:
         random.seed(args.seed)
         random.shuffle(train)
@@ -600,7 +603,7 @@ def main(raw_args=None):
 
     prev_best = None
     if args.train:
-        print('Start training...')
+        # print('Start training...')
         step = 0
         for epoch in tqdm(range(EPOCHS), position=0, desc='Epochs'):
             random.shuffle(train)
@@ -662,15 +665,15 @@ def main(raw_args=None):
             for instance in test:
                 dy.renew_cg()
                 _, _, prediction = do_instance(instance, False, model, optimizer, False)
-                fout.write("{}:{} {} -/n".format(instance[0], instance[1], instance[1] - prediction))
+                fout.write("{}:{} {} -".format(instance[0], instance[1], instance[1] - prediction))
     else:
         for instance in test:
             dy.renew_cg()
             _, _, prediction = do_instance(instance, False, model, optimizer, False)
-            print("{}:{} {} -/n".format(instance[0], instance[1], instance[1] - prediction))
+            print("{}:{} {} -".format(instance[0], instance[1], instance[1] - prediction))
 
     log_file.close()
 
 if __name__ == '__main__':
-    print(sys.argv[1:])
+    # print(sys.argv[1:])
     main(sys.argv[1:])

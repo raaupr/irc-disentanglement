@@ -12,7 +12,9 @@ if __name__ == '__main__':
 
     done_training = False
     for line in sys.stdin:
-        if line.startswith("data/"):
+        if line.startswith("data/") or line.startswith("../data/"):
             line = line.split('/')[-1].strip()
-            parts = line.split()
-            print("{}:{}".format(parts[0], ' '.join(parts[1:])))
+            #parts = line.split()
+            #print('>', parts)
+            #print("{}:{}".format(parts[0], ' '.join(parts[1:])))
+            print(line)

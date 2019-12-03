@@ -158,7 +158,8 @@ def adjusted_mutual_information(gold, auto):
     for pair in order:
         labels_pred.append(auto_map[pair])
 
-    score = metrics.adjusted_mutual_info_score(labels_true, labels_pred, 'max')
+    # score = metrics.adjusted_mutual_info_score(labels_true, labels_pred, 'max')
+    score = metrics.adjusted_mutual_info_score(labels_true, labels_pred)
     print("{:5.2f}   adjusted mutual information".format(100 * score))
 
 def shen_f1(contingency, row_sums, col_sums, gold, auto):
@@ -453,6 +454,9 @@ def start_and_end_together(gold, auto):
     print("{:5.2f}   Start and end of cluster still together".format(100 * together / total))
 
 if __name__ == '__main__':
+
+    # print(sys.argv)
+
     parser = argparse.ArgumentParser(description='Calculate cluster / thread / conversation metrics.')
     parser.add_argument('gold', help='File containing the gold clusters, one per line. If a line contains a ":" the start is considered a filename')
     parser.add_argument('auto', help='File containing the system clusters, one per line. If a line contains a ":" the start is considered a filename')
