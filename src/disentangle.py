@@ -398,7 +398,7 @@ def main(raw_args=None):
     def read_data(filenames, is_test=False):
         instances = []
         done = set()
-        for filename in tqdm(filenames, desc="Reading"):
+        for filename in tqdm(filenames, desc="Reading", dynamic_ncols=True, unit="file"):
             name = filename
             for ending in [".annotation.txt", ".ascii.txt", ".raw.txt", ".tok.txt"]:
                 if filename.endswith(ending):
@@ -621,7 +621,7 @@ def main(raw_args=None):
     if args.train:
         # print('Start training...')
         step = 0
-        for epoch in tqdm(range(EPOCHS), position=0, desc='Epochs'):
+        for epoch in tqdm(range(EPOCHS), position=0, desc='Epochs', dynamic_ncols=True, unit='epoch'):
             random.shuffle(train)
 
             # Update learning rate
@@ -632,7 +632,7 @@ def main(raw_args=None):
             match = 0
             total = 0
             loss_steps = 0
-            for instance in tqdm(train, position=1, desc=f'Epoch {epoch} batches'):
+            for instance in tqdm(train, position=1, desc=f'Epoch {epoch} batches', dynamic_ncols=True, unit='batch'):
                 step += 1
 
                 dy.renew_cg()
