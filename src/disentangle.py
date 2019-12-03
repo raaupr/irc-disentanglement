@@ -37,6 +37,7 @@ def main(raw_args=None):
     parser.add_argument('--word-vectors', help="File containing word embeddings.")
     parser.add_argument('--layers', default=2, type=int, help="Number of hidden layers in the model")
     parser.add_argument('--nonlin', choices=["tanh", "cube", "logistic", "relu", "elu", "selu", "softsign", "swish", "linear"], default='softsign', help="Non-linearity type.")
+    parser.add_argument('--no-features', action='store_true', help='Remove features other than the textual features.')
 
     # Inference arguments
     parser.add_argument('--max-dist', default=101, type=int, help="Maximum number of messages to consider when forming a link (count includes the current message).")
@@ -405,7 +406,6 @@ def main(raw_args=None):
             if name in done:
                 continue
             done.add(name)
-            tqdm.write(name)
             with open(name + ".ascii.txt", 'rt') as fin:
                 text_ascii = [l.strip().split() for l in fin]
             text_tok = []
@@ -447,7 +447,10 @@ def main(raw_args=None):
 
             self.model = dy.ParameterCollection()
 
-            input_size = FEATURES
+            if args.no_features:
+                input_size = 0
+            else:
+                input_size = FEATURES
 
             # Create word embeddings and initialise
             self.id_to_token = []
@@ -486,12 +489,16 @@ def main(raw_args=None):
                 qvec_max = dy.emax(qvecs)
                 qvec_mean = dy.average(qvecs)
             for otext, features in options:
-                inputs = dy.inputTensor(features)
+                if not args.no_features:
+                    inputs = dy.inputTensor(features)
                 if args.word_vectors:
                     ovecs = [dy.lookup(self.pEmbedding, w) for w in otext]
                     ovec_max = dy.emax(ovecs)
                     ovec_mean = dy.average(ovecs)
-                    inputs = dy.concatenate([inputs, qvec_max, qvec_mean, ovec_max, ovec_mean])
+                    if args.no_features:
+                        inputs = dy.concatenate([qvec_max, qvec_mean, ovec_max, ovec_mean])
+                    else:
+                        inputs = dy.concatenate([inputs, qvec_max, qvec_mean, ovec_max, ovec_mean])
                 if args.drop > 0:
                     inputs = dy.dropout(inputs, args.drop)
                 h = inputs

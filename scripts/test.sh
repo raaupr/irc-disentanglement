@@ -1,5 +1,5 @@
 
-# bash scripts/infer.sh
+bash scripts/infer.sh
 
 OUTDIR="/Users/audi/Documents/GitHub/forked/irc-disentanglement/output"
 
@@ -36,12 +36,10 @@ python tools/evaluation/graph-eval.py --gold data/test/*annotation.txt --auto ${
 echo '====== CLUSTER BASED ======'
 for name in ${OUTDIR}/example-run*.test.out ; do tools/format-conversion/graph-to-cluster.py < $name.graphs > $name.clusters ; done
 
-src/majority_vote.py ${OUTDIR}/example-run*.test.out.clusters --method intersect > ${OUTDIR}/example-run.combined.test.intersect
-
 echo '===== KUMMERFELD'
-python tools/format-conversion/input-to-file.py data/test/*anno*.txt > data/test/annotation.out
-tools/format-conversion/output-from-py-to-graph.py < data/test/annotation.out > data/test/annotation.out.graphs
-tools/format-conversion/graph-to-cluster.py < data/test/annotation.out.graphs > data/test/annotation.out.graphs.clusters
+python tools/format-conversion/input-to-file.py data/test/*anno*.txt > ${OUTDIR}/test.annotation.out
+tools/format-conversion/output-from-py-to-graph.py < ${OUTDIR}/test.annotation.out > ${OUTDIR}/test.annotation.out.graphs
+tools/format-conversion/graph-to-cluster.py < ${OUTDIR}/test.annotation.out.graphs > ${OUTDIR}/test.annotation.out.graphs.clusters
 
 total_vi=0.0
 total_11=0.0
@@ -50,7 +48,7 @@ total_r=0.0
 total_f1=0.0
 for SEED in {1..10}
 do
-    OUTPUT=`python tools/evaluation/conversation-eval.py data/test/annotation.out.graphs.clusters ${OUTDIR}/example-run-$SEED.test.out.graphs.clusters --metric vi 1-1 ex`
+    OUTPUT=`python tools/evaluation/conversation-eval.py ${OUTDIR}/test.annotation.out.graphs.clusters ${OUTDIR}/example-run-$SEED.test.out.clusters --metric vi 1-1 ex`
     # echo ${SEED} ${OUTPUT}
     vi=`echo ${OUTPUT} | cut -d' ' -f 1`
     onetoone=`echo ${OUTPUT} | cut -d' ' -f 62`
@@ -74,14 +72,15 @@ echo "AVG p/r/f: $avg_p $avg_r $avg_f1"
 
 echo '=== x10 union'
 tools/format-conversion/graph-to-cluster.py < ${OUTDIR}/example-run.combined.test.union > ${OUTDIR}/example-run.combined.test.union.clusters
-python tools/evaluation/conversation-eval.py data/test/annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.union.clusters --metric vi 1-1 ex
+python tools/evaluation/conversation-eval.py ${OUTDIR}/test.annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.union.clusters --metric vi 1-1 ex
 
 echo '=== x10 vote'
 tools/format-conversion/graph-to-cluster.py < ${OUTDIR}/example-run.combined.test.vote > ${OUTDIR}/example-run.combined.test.vote.clusters
-python tools/evaluation/conversation-eval.py data/test/annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.vote.clusters --metric vi 1-1 ex
+python tools/evaluation/conversation-eval.py ${OUTDIR}/test.annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.vote.clusters --metric vi 1-1 ex
 
 echo '=== x10 intersect'
-python tools/evaluation/conversation-eval.py data/test/annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.intersect --metric vi 1-1 ex
+src/majority_vote.py ${OUTDIR}/example-run*.test.out.clusters --method intersect > ${OUTDIR}/example-run.combined.test.intersect
+python tools/evaluation/conversation-eval.py ${OUTDIR}/test.annotation.out.graphs.clusters ${OUTDIR}/example-run.combined.test.intersect --metric vi 1-1 ex
 
 echo '===== DSTC8'
 
